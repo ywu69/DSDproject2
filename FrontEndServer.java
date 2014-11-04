@@ -281,7 +281,7 @@ public class FrontEndServer implements Runnable {
 									new InputStreamReader(
 											postSocket.getInputStream()));
 
-							if (recerive_br.ready()) {
+							//if (recerive_br.ready()) {
 								String receive_line = null;
 								ArrayList<String> receive_Hearder = new ArrayList<String>();
 
@@ -307,12 +307,12 @@ public class FrontEndServer implements Runnable {
 								}
 
 								postSocket.close();
-							} else {
-								logger.info("1 Test,Test@@@@@@@@@@@@@@@@@@@@@");
-								logger.info("Primary Server Unavailable!");
-								hrh.response(503, "Service Unavailable",
-										"Primary Server Unavailable, please try later!");
-							}
+//							} else {
+//								logger.info("1 Test,Test@@@@@@@@@@@@@@@@@@@@@");
+//								logger.info("Primary Server Unavailable!");
+//								hrh.response(503, "Service Unavailable",
+//										"Primary Server Unavailable, please try later!");
+//							}
 						}
 					} else {
 						hrh.response(400, "Bad Request",
