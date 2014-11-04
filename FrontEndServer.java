@@ -308,6 +308,7 @@ public class FrontEndServer implements Runnable {
 
 								postSocket.close();
 							} else {
+								logger.info("1 Test,Test@@@@@@@@@@@@@@@@@@@@@");
 								logger.info("Primary Server Unavailable!");
 								hrh.response(503, "Service Unavailable",
 										"Primary Server Unavailable, please try later!");
@@ -378,6 +379,7 @@ public class FrontEndServer implements Runnable {
 					postSocket.close();
 				} catch (IOException e1) {
 					logger.debug(e1.getMessage(), e1);
+					logger.info("2 Test,Test@@@@@@@@@@@@@@@@@@@@@");
 					logger.info("Primary Server Unavailable!");
 					hrh.response(503, "Service Unavailable",
 							"Primary Server Unavailable, please try later!");
