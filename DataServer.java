@@ -251,7 +251,7 @@ public class DataServer implements Runnable {
 		int self_port = Integer.valueOf(args[0]);
 		String discovery_ipAddrs = null;
 		try {
-			self_ipAddrs = InetAddress.getByName("localhost").getHostAddress();
+			self_ipAddrs = InetAddress.getLocalHost().getHostAddress();
 			discovery_ipAddrs = InetAddress.getByName(args[1]).getHostAddress();
 		} catch (UnknownHostException e) {
 			logger.debug(e.getMessage(), e);
