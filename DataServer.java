@@ -1155,22 +1155,25 @@ public class DataServer implements Runnable {
 						String receive_line = null;
 						ArrayList<String> receive_Hearder = new ArrayList<String>();
 
-						while (!(receive_line = recerive_br.readLine().trim())
-								.equals("")) {
-							receive_Hearder.add(receive_line);
+						String line = recerive_br.readLine().trim();
+						if (line != null) {
+							receive_Hearder.add(line);
+							while (!(receive_line = recerive_br.readLine()
+									.trim()).equals("")) {
+								receive_Hearder.add(receive_line);
+							}
+
+							String[] responseHeader = null;
+							responseHeader = receive_Hearder.get(0).trim()
+									.split(" ");
+
+							String responseType = null;
+							responseType = responseHeader[1];
+
+							if (!responseType.equals("201")) {
+								updateSuccessfully = false;
+							}
 						}
-
-						String[] responseHeader = null;
-						responseHeader = receive_Hearder.get(0).trim()
-								.split(" ");
-
-						String responseType = null;
-						responseType = responseHeader[1];
-
-						if (!responseType.equals("201")) {
-							updateSuccessfully = false;
-						}
-
 						notifySocket.close();
 					} catch (IOException e) {
 						logger.debug(e.getMessage(), e);
@@ -1186,9 +1189,9 @@ public class DataServer implements Runnable {
 			}
 
 			if (updateSuccessfully) {
-				logger.info("Created both in primary and secondary servers!");
+				logger.info("Created tweet in all secondary servers!");
 				hrh.response(201, "Created",
-						"Created both in primary and secondary servers!");
+						"Created tweet in all secondary servers!");
 			} else {
 				logger.info("Sync data unsuccessfully!");
 				hrh.response(503, "Service Unavailable",
