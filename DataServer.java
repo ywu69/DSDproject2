@@ -250,12 +250,10 @@ public class DataServer implements Runnable {
 		String self_ipAddrs = null;
 		int self_port = Integer.valueOf(args[1]);
 		String discovery_ipAddrs = null;
-		try {
-			self_ipAddrs = InetAddress.getByName(args[0]).getHostAddress();
-			discovery_ipAddrs = InetAddress.getByName(args[2]).getHostAddress();
-		} catch (UnknownHostException e) {
-			logger.debug(e.getMessage(), e);
-		}
+
+		self_ipAddrs = args[0];
+		discovery_ipAddrs = args[2];
+		
 		int discovery_port = Integer.valueOf(args[3]);
 		DataServer ds = new DataServer(self_ipAddrs, self_port,
 				discovery_ipAddrs, discovery_port);
@@ -295,23 +293,23 @@ public class DataServer implements Runnable {
 				wr.write("\r\n");
 				wr.flush();
 
-//				BufferedReader recerive_br = new BufferedReader(
-//						new InputStreamReader(detectSocket.getInputStream()));
-//
-//				while (!(recerive_br.readLine().trim()).equals("")) {
-//				}
-//
-//				if (recerive_br.ready()) {
-//					char[] bodyChars = new char[1000];
-//					recerive_br.read(bodyChars);
-//					StringBuffer sb = new StringBuffer();
-//					sb.append(bodyChars);
-//					String receive_body = sb.toString().trim();
-//
-//					if (receive_body.equals("I'm alive!")) {
-//						logger.info("Primary data server is alive!");
-//					}
-//				}
+				// BufferedReader recerive_br = new BufferedReader(
+				// new InputStreamReader(detectSocket.getInputStream()));
+				//
+				// while (!(recerive_br.readLine().trim()).equals("")) {
+				// }
+				//
+				// if (recerive_br.ready()) {
+				// char[] bodyChars = new char[1000];
+				// recerive_br.read(bodyChars);
+				// StringBuffer sb = new StringBuffer();
+				// sb.append(bodyChars);
+				// String receive_body = sb.toString().trim();
+				//
+				// if (receive_body.equals("I'm alive!")) {
+				// logger.info("Primary data server is alive!");
+				// }
+				// }
 
 				detectSocket.close();
 			} catch (IOException e) {
@@ -951,7 +949,8 @@ public class DataServer implements Runnable {
 				JSONObject latestData = (JSONObject) updateData.get("logData");
 
 				for (int i = mycurrentDataVersion + 1; i <= latestVersion; i++) {
-					JSONObject eachLogObject = (JSONObject) latestData.get(String.valueOf(i));
+					JSONObject eachLogObject = (JSONObject) latestData
+							.get(String.valueOf(i));
 
 					String newTweet = eachLogObject.get("logTweet").toString();
 					JSONArray newHashtagsArray = (JSONArray) eachLogObject
@@ -983,7 +982,8 @@ public class DataServer implements Runnable {
 					ds_tweetsMap.addLogData(
 							ds_tweetsMap.getDataServerVersion(), newTweet,
 							newHashtagsArray);
-					logger.info("Successfully consistent my data, my current data version is: " + ds_tweetsMap.getDataServerVersion());
+					logger.info("Successfully consistent my data, my current data version is: "
+							+ ds_tweetsMap.getDataServerVersion());
 				}
 
 			} catch (IOException e) {
