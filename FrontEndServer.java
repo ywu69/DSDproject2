@@ -281,38 +281,39 @@ public class FrontEndServer implements Runnable {
 									new InputStreamReader(
 											postSocket.getInputStream()));
 
-							//if (recerive_br.ready()) {
-								String receive_line = null;
-								ArrayList<String> receive_Hearder = new ArrayList<String>();
+							String receive_line = null;
+							ArrayList<String> receive_Hearder = new ArrayList<String>();
 
+							try {
 								while (!(receive_line = recerive_br.readLine()
 										.trim()).equals("")) {
 									receive_Hearder.add(receive_line);
 								}
+							} catch (IOException e) {
+								logger.info("%%%%%%%%%%%% IOException");
+								logger.info("Primary Server Unavailable!");
+								hrh.response(503, "Service Unavailable",
+										"Primary Server Unavailable, please try later!");
+								logger.debug(e.getMessage(), e);
+							}
 
-								String[] responseHeader = null;
-								responseHeader = receive_Hearder.get(0).trim()
-										.split(" ");
+							String[] responseHeader = null;
+							responseHeader = receive_Hearder.get(0).trim()
+									.split(" ");
 
-								String responseType = null;
-								responseType = responseHeader[1];
+							String responseType = null;
+							responseType = responseHeader[1];
 
-								if (responseType.equals("201")) {
-									logger.info("Post a tweet into data server successfully!");
-									hrh.response(201, "Created", "Created!");
-								} else if (responseType.equals("406")) {
-									hrh.response(406, "Not Acceptable",
-											"This tweet exists in data server!");
-									logger.info("This tweet exists in data server!");
-								}
+							if (responseType.equals("201")) {
+								logger.info("Post a tweet into data server successfully!");
+								hrh.response(201, "Created", "Created!");
+							} else if (responseType.equals("406")) {
+								hrh.response(406, "Not Acceptable",
+										"This tweet exists in data server!");
+								logger.info("This tweet exists in data server!");
+							}
 
-								postSocket.close();
-//							} else {
-//								logger.info("1 Test,Test@@@@@@@@@@@@@@@@@@@@@");
-//								logger.info("Primary Server Unavailable!");
-//								hrh.response(503, "Service Unavailable",
-//										"Primary Server Unavailable, please try later!");
-//							}
+							postSocket.close();
 						}
 					} else {
 						hrh.response(400, "Bad Request",
