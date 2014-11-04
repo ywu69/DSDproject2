@@ -248,10 +248,12 @@ public class DataServer implements Runnable {
 
 	public static void main(String[] args) {
 		String self_ipAddrs = null;
-		int self_port = Integer.valueOf(args[1]);
 		String discovery_ipAddrs = null;
 
 		self_ipAddrs = String.valueOf(args[0]);
+		
+		int self_port = Integer.valueOf(args[1]);
+
 		discovery_ipAddrs = String.valueOf(args[2]);
 		
 		int discovery_port = Integer.valueOf(args[3]);
