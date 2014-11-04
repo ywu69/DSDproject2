@@ -299,22 +299,21 @@ public class FrontEndServer implements Runnable {
 										.trim()).equals("")) {
 									receive_Hearder.add(receive_line);
 								}
-							}
-
-							String[] responseHeader = null;
-							responseHeader = receive_Hearder.get(0).trim()
-									.split(" ");
-
-							String responseType = null;
-							responseType = responseHeader[1];
-
-							if (responseType.equals("201")) {
-								logger.info("Post a tweet into data server successfully!");
-								hrh.response(201, "Created", "Created!");
-							} else if (responseType.equals("406")) {
-								hrh.response(406, "Not Acceptable",
-										"This tweet exists in data server!");
-								logger.info("This tweet exists in data server!");
+								String[] responseHeader = null;
+								responseHeader = receive_Hearder.get(0).trim()
+										.split(" ");
+								
+								String responseType = null;
+								responseType = responseHeader[1];
+								
+								if (responseType.equals("201")) {
+									logger.info("Post a tweet into data server successfully!");
+									hrh.response(201, "Created", "Created!");
+								} else if (responseType.equals("406")) {
+									hrh.response(406, "Not Acceptable",
+											"This tweet exists in data server!");
+									logger.info("This tweet exists in data server!");
+								}
 							}
 
 							postSocket.close();
