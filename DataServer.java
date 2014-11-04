@@ -493,6 +493,8 @@ public class DataServer implements Runnable {
 				}
 			} else {
 				logger.info("Do not need to do data consistent ######################");
+				logger.info("################## Notifying discovery and all secondary servers about new primary");
+				notifyNewPrimary();
 			}
 		}
 
