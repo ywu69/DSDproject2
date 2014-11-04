@@ -1180,8 +1180,7 @@ public class DataServer implements Runnable {
 					}
 					// For test purpose...........................
 					try {
-						logger.info("For test inconsistency, kill primary now !!!!!!!!!!!!!!!!!!!!!!");
-						Thread.sleep(5000);
+						Thread.sleep(3000);
 					} catch (InterruptedException e) {
 						logger.debug(e.getMessage(), e);
 					}

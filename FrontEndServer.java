@@ -284,10 +284,6 @@ public class FrontEndServer implements Runnable {
 							String receive_line = null;
 							ArrayList<String> receive_Hearder = new ArrayList<String>();
 
-							// while (!(receive_line = recerive_br.readLine()
-							// .trim()).equals("")) {
-							// receive_Hearder.add(receive_line);
-							// }
 							String line = recerive_br.readLine();
 							if (line == null) {
 								logger.info("Primary Server Unavailable!");
@@ -302,10 +298,10 @@ public class FrontEndServer implements Runnable {
 								String[] responseHeader = null;
 								responseHeader = receive_Hearder.get(0).trim()
 										.split(" ");
-								
+
 								String responseType = null;
 								responseType = responseHeader[1];
-								
+
 								if (responseType.equals("201")) {
 									logger.info("Post a tweet into data server successfully!");
 									hrh.response(201, "Created", "Created!");
@@ -383,7 +379,6 @@ public class FrontEndServer implements Runnable {
 					postSocket.close();
 				} catch (IOException e1) {
 					logger.debug(e1.getMessage(), e1);
-					logger.info("2 Test,Test@@@@@@@@@@@@@@@@@@@@@");
 					logger.info("Primary Server Unavailable!");
 					hrh.response(503, "Service Unavailable",
 							"Primary Server Unavailable, please try later!");
@@ -464,78 +459,91 @@ public class FrontEndServer implements Runnable {
 					String receive_line = null;
 					ArrayList<String> receive_Hearder = new ArrayList<String>();
 
-					while (!(receive_line = recerive_br.readLine().trim())
-							.equals("")) {
-						receive_Hearder.add(receive_line);
-					}
+					String line = recerive_br.readLine();
+					if (line == null) {
+						logger.info("Primary Server Unavailable!");
+						hrh.response(503, "Service Unavailable",
+								"Primary Server Unavailable, please try later!");
+					} else {
+						receive_Hearder.add(line);
+						while (!(receive_line = recerive_br.readLine().trim())
+								.equals("")) {
+							receive_Hearder.add(receive_line);
+						}
 
-					char[] bodyChars = new char[1000];
-					recerive_br.read(bodyChars);
-					StringBuffer sb = new StringBuffer();
-					sb.append(bodyChars);
-					String receive_body = sb.toString().trim();
-
-					/*
-					 * If the response from data server is
-					 * "Your version is up-to-date!", get the tweets of this
-					 * serachterm from cache and send it to client
-					 */
-					if (receive_body.equals("Your version is up-to-date!")) {
-						JSONArray final_tweetArray = fe_tweetsMap
-								.getTweetsArray(searchterm);
-						JSONObject final_response = new JSONObject();
-						final_response.put("q", searchterm);
-						final_response.put("tweets", final_tweetArray);
-						hrh.response(200, "OK", final_response.toString());
-						logger.info("Response to client directly............");
-					}
-					/*
-					 * If the response from data server is not
-					 * "Your version is up-to-date!", get the tweets of this
-					 * serachterm from data server and send it to client
-					 */
-					else {
-						JSONParser jp = new JSONParser();
-						JSONObject receiveBody = (JSONObject) jp
-								.parse(receive_body);
-						int ds_versionNum = Integer.valueOf(receiveBody
-								.get("v").toString());
-
-						JSONObject final_response = new JSONObject();
-						JSONArray final_tweetArray = (JSONArray) receiveBody
-								.get("tweets");
+						char[] bodyChars = new char[1000];
+						recerive_br.read(bodyChars);
+						StringBuffer sb = new StringBuffer();
+						sb.append(bodyChars);
+						String receive_body = sb.toString().trim();
 
 						/*
-						 * If the versionNum in the response is -1, that means
-						 * the data server also contains no this searchterm Then
-						 * send an response with empty tweet array to client
+						 * If the response from data server is
+						 * "Your version is up-to-date!", get the tweets of this
+						 * serachterm from cache and send it to client
 						 */
-						if (ds_versionNum == -1) {
+						if (receive_body.equals("Your version is up-to-date!")) {
+							JSONArray final_tweetArray = fe_tweetsMap
+									.getTweetsArray(searchterm);
+							JSONObject final_response = new JSONObject();
 							final_response.put("q", searchterm);
 							final_response.put("tweets", final_tweetArray);
 							hrh.response(200, "OK", final_response.toString());
-							logger.info("No search result............");
+							logger.info("Response to client directly............");
 						}
 						/*
-						 * If the versionNum in the response is not -1, that
-						 * means the cache need to update its version, Then send
-						 * an response with the tweets about this serchterm from
-						 * data server to client, Then update the cache to
-						 * latest version
+						 * If the response from data server is not
+						 * "Your version is up-to-date!", get the tweets of this
+						 * serachterm from data server and send it to client
 						 */
 						else {
-							final_response.put("q", searchterm);
-							final_response.put("tweets", final_tweetArray);
-							hrh.response(200, "OK", final_response.toString());
-							logger.info("Response to client and update the cache............");
-							/* Update CacheHashMap */
-							TweetsData final_tweetsData = new TweetsData();
-							final_tweetsData.setVersionNum(ds_versionNum);
-							final_tweetsData.setTweetsArray(final_tweetArray);
-							fe_tweetsMap.setTweetsHashMap(searchterm,
-									final_tweetsData);
+							JSONParser jp = new JSONParser();
+							JSONObject receiveBody = (JSONObject) jp
+									.parse(receive_body);
+							int ds_versionNum = Integer.valueOf(receiveBody
+									.get("v").toString());
+
+							JSONObject final_response = new JSONObject();
+							JSONArray final_tweetArray = (JSONArray) receiveBody
+									.get("tweets");
+
+							/*
+							 * If the versionNum in the response is -1, that
+							 * means the data server also contains no this
+							 * searchterm Then send an response with empty tweet
+							 * array to client
+							 */
+							if (ds_versionNum == -1) {
+								final_response.put("q", searchterm);
+								final_response.put("tweets", final_tweetArray);
+								hrh.response(200, "OK",
+										final_response.toString());
+								logger.info("No search result............");
+							}
+							/*
+							 * If the versionNum in the response is not -1, that
+							 * means the cache need to update its version, Then
+							 * send an response with the tweets about this
+							 * serchterm from data server to client, Then update
+							 * the cache to latest version
+							 */
+							else {
+								final_response.put("q", searchterm);
+								final_response.put("tweets", final_tweetArray);
+								hrh.response(200, "OK",
+										final_response.toString());
+								logger.info("Response to client and update the cache............");
+								/* Update CacheHashMap */
+								TweetsData final_tweetsData = new TweetsData();
+								final_tweetsData.setVersionNum(ds_versionNum);
+								final_tweetsData
+										.setTweetsArray(final_tweetArray);
+								fe_tweetsMap.setTweetsHashMap(searchterm,
+										final_tweetsData);
+							}
 						}
 					}
+
 					connectToDsSocket.close();
 				} catch (IOException e) {
 					logger.debug(e.getMessage(), e);
