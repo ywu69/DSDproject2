@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Status determines which log4j log messages are included. -->
+<Configuration status="WARN">
+	<Appenders>
+		<!-- We can make the console output more user-friendly if we want. -->
+		<!--
+        <Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%level: %m%n">
+			</PatternLayout>
+		</Console>
+		-->
+
+		<Console name="DSLog_Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%level: %m%n">
+			</PatternLayout>
+		</Console>
+
+		<Console name="FELog_Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%level: %m%n">
+			</PatternLayout>
+		</Console>
+
+		<Console name="DiscLog_Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%level: %m%n">
+			</PatternLayout>
+		</Console>
+
+		<!-- We can still keep details in a file log for debugging. -->
+		<File name="DSLog" fileName="DataServer.log" append="true">
+
+			<PatternLayout
+				pattern="%date{HH:mm:ss:SSS} [%-5level{lowerCase=true}] %file:%line %t: %m%n">
+			</PatternLayout>
+		</File>
+
+		<File name="FELog" fileName="FrontEndServer.log" append="true">
+
+			<PatternLayout
+				pattern="%date{HH:mm:ss:SSS} [%-5level{lowerCase=true}] %file:%line %t: %m%n">
+			</PatternLayout>
+		</File>
+
+		<File name="DiscLog" fileName="DiscoveryServer.log" append="true">
+
+			<PatternLayout
+				pattern="%date{HH:mm:ss:SSS} [%-5level{lowerCase=true}] %file:%line %t: %m%n">
+			</PatternLayout>
+		</File>
+
+	</Appenders>
+
+	<Loggers>
+		
+		<Logger name="DataServer">
+			<AppenderRef ref="DSLog" level="INFO" />
+			<AppenderRef ref="DSLog_Console" level="INFO" />
+
+		</Logger>
+
+		<Logger name="FrontEndServer">
+			<AppenderRef ref="FELog" level="INFO" />
+			<AppenderRef ref="FELog_Console" level="INFO" />
+
+		</Logger>
+
+		<Logger name="DiscoveryServer">
+			<AppenderRef ref="DiscLog" level="INFO" />
+			<AppenderRef ref="DiscLog_Console" level="INFO" />
+
+		</Logger>
+
+		<!-- This is the configuration used by all other loggers. -->
+		<Root level="ALL">
+			<!--
+			<AppenderRef ref="Console" level="INFO" />
+			-->
+		</Root>
+
+	</Loggers>
+</Configuration>
