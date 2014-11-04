@@ -295,23 +295,23 @@ public class DataServer implements Runnable {
 				wr.write("\r\n");
 				wr.flush();
 
-//				BufferedReader recerive_br = new BufferedReader(
-//						new InputStreamReader(detectSocket.getInputStream()));
-//
-//				while (!(recerive_br.readLine().trim()).equals("")) {
-//				}
-//
-//				if (recerive_br.ready()) {
-//					char[] bodyChars = new char[1000];
-//					recerive_br.read(bodyChars);
-//					StringBuffer sb = new StringBuffer();
-//					sb.append(bodyChars);
-//					String receive_body = sb.toString().trim();
-//
-//					if (receive_body.equals("I'm alive!")) {
-//						logger.info("Primary data server is alive!");
-//					}
-//				}
+				// BufferedReader recerive_br = new BufferedReader(
+				// new InputStreamReader(detectSocket.getInputStream()));
+				//
+				// while (!(recerive_br.readLine().trim()).equals("")) {
+				// }
+				//
+				// if (recerive_br.ready()) {
+				// char[] bodyChars = new char[1000];
+				// recerive_br.read(bodyChars);
+				// StringBuffer sb = new StringBuffer();
+				// sb.append(bodyChars);
+				// String receive_body = sb.toString().trim();
+				//
+				// if (receive_body.equals("I'm alive!")) {
+				// logger.info("Primary data server is alive!");
+				// }
+				// }
 
 				detectSocket.close();
 			} catch (IOException e) {
@@ -360,7 +360,7 @@ public class DataServer implements Runnable {
 							String receive_body = sb.toString().trim();
 
 							if (receive_body.equals("You can't be primary!")) {
-								logger.info("############# I can't be primary dataserver!");
+								logger.info("############# Receive a response from higher server, so I can't be primary!");
 								canbePrimary = false;
 								break;
 							}
@@ -380,8 +380,6 @@ public class DataServer implements Runnable {
 				currentPrimary.put("dataserverID", dataserverID);
 				logger.info("################## Resolve any inconsistencies in all data servers");
 				consistentData();
-				logger.info("################## Notifying discovery and all secondary servers about new primary");
-				notifyNewPrimary();
 			}
 		}
 
@@ -468,11 +466,33 @@ public class DataServer implements Runnable {
 					wr.write("\r\n");
 					wr.write(dataRange.toString());
 					wr.flush();
-					wr.close();
+
+					BufferedReader recerive_br = new BufferedReader(
+							new InputStreamReader(
+									getDataSocket.getInputStream()));
+
+					while (!(recerive_br.readLine().trim()).equals("")) {
+					}
+
+					char[] bodyChars = new char[1000];
+					recerive_br.read(bodyChars);
+					StringBuffer sb = new StringBuffer();
+					sb.append(bodyChars);
+					String receive_body = sb.toString().trim();
+
+					if (receive_body
+							.equals("Notify update for all dataservers complete!")) {
+						logger.info("################## Notify update for all dataservers complete!");
+						logger.info("################## Notifying discovery and all secondary servers about new primary");
+						notifyNewPrimary();
+					}
+
 					getDataSocket.close();
 				} catch (IOException e) {
 					logger.debug(e.getMessage(), e);
 				}
+			} else {
+				logger.info("Do not need to do data consistent ######################");
 			}
 		}
 
@@ -658,8 +678,8 @@ public class DataServer implements Runnable {
 					} else if (hl.getUripath().equals("latestData")) {
 						String httpMethod = hl.getMethod().toString();
 						if (httpMethod.equals("GET")) {
-							logger.info("Receive a latest data retrieve request ##################");
-							getMyLastestData(br);
+							logger.info("Receive a latest data retrieve request, I need to send the latest data to other data servers ##################");
+							getMyLastestData(hrh, br);
 						} else {
 							hrh.response(405, "Method Not Allowed",
 									"We do not provide this method!");
@@ -866,7 +886,7 @@ public class DataServer implements Runnable {
 			hrh.response(200, "OK", ss);
 		}
 
-		private void getMyLastestData(BufferedReader br) {
+		private void getMyLastestData(HTTPResponseHandler hrh, BufferedReader br) {
 			try {
 				char[] bodyChars = new char[1000];
 				br.read(bodyChars);
@@ -927,6 +947,8 @@ public class DataServer implements Runnable {
 						}
 					}
 				}
+				hrh.response(200, "OK",
+						"Notify update for all dataservers complete!");
 			} catch (IOException e) {
 				logger.debug(e.getMessage(), e);
 			} catch (ParseException e) {
@@ -951,7 +973,8 @@ public class DataServer implements Runnable {
 				JSONObject latestData = (JSONObject) updateData.get("logData");
 
 				for (int i = mycurrentDataVersion + 1; i <= latestVersion; i++) {
-					JSONObject eachLogObject = (JSONObject) latestData.get(String.valueOf(i));
+					JSONObject eachLogObject = (JSONObject) latestData
+							.get(String.valueOf(i));
 
 					String newTweet = eachLogObject.get("logTweet").toString();
 					JSONArray newHashtagsArray = (JSONArray) eachLogObject
@@ -983,7 +1006,8 @@ public class DataServer implements Runnable {
 					ds_tweetsMap.addLogData(
 							ds_tweetsMap.getDataServerVersion(), newTweet,
 							newHashtagsArray);
-					logger.info("Successfully consistent my data, my current data version is: " + ds_tweetsMap.getDataServerVersion());
+					logger.info("Successfully consistent my data, my current data version is: "
+							+ ds_tweetsMap.getDataServerVersion());
 				}
 
 			} catch (IOException e) {
