@@ -284,17 +284,21 @@ public class FrontEndServer implements Runnable {
 							String receive_line = null;
 							ArrayList<String> receive_Hearder = new ArrayList<String>();
 
-							try {
+							// while (!(receive_line = recerive_br.readLine()
+							// .trim()).equals("")) {
+							// receive_Hearder.add(receive_line);
+							// }
+							String line = recerive_br.readLine();
+							if (line == null) {
+								logger.info("Primary Server Unavailable!");
+								hrh.response(503, "Service Unavailable",
+										"Primary Server Unavailable, please try later!");
+							} else {
+								receive_Hearder.add(line);
 								while (!(receive_line = recerive_br.readLine()
 										.trim()).equals("")) {
 									receive_Hearder.add(receive_line);
 								}
-							} catch (IOException e) {
-								logger.info("%%%%%%%%%%%% IOException");
-								logger.info("Primary Server Unavailable!");
-								hrh.response(503, "Service Unavailable",
-										"Primary Server Unavailable, please try later!");
-								logger.debug(e.getMessage(), e);
 							}
 
 							String[] responseHeader = null;
