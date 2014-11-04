@@ -1155,7 +1155,7 @@ public class DataServer implements Runnable {
 						String receive_line = null;
 						ArrayList<String> receive_Hearder = new ArrayList<String>();
 
-						String line = recerive_br.readLine().trim();
+						String line = recerive_br.readLine();
 						if (line != null) {
 							receive_Hearder.add(line);
 							while (!(receive_line = recerive_br.readLine()

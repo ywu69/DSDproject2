@@ -288,7 +288,7 @@ public class FrontEndServer implements Runnable {
 							// .trim()).equals("")) {
 							// receive_Hearder.add(receive_line);
 							// }
-							String line = recerive_br.readLine().trim();
+							String line = recerive_br.readLine();
 							if (line == null) {
 								logger.info("Primary Server Unavailable!");
 								hrh.response(503, "Service Unavailable",
