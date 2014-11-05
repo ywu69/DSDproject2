@@ -137,10 +137,6 @@ public class DiscoveryServer implements Runnable {
 						logger.debug(e.getMessage(), e);
 						if (dateserverID == currentPrimaryID) {
 							logger.info("Primary dataserver is down, waiting for new primary!");
-						} else {
-							logger.info("No."
-									+ dateserverID
-									+ " secondary dataserver is down, remove it from backEnds array!");
 						}
 						discoveryData.removeBackEnd(eachBackEnd);
 					}
