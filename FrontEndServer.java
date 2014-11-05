@@ -307,7 +307,8 @@ public class FrontEndServer implements Runnable {
 															.getOutputStream()));
 
 									String path_2 = "/tweets";
-									wr_2.write("POST " + path_2 + " HTTP/1.1\r\n");
+									wr_2.write("POST " + path_2
+											+ " HTTP/1.1\r\n");
 									wr_2.write("Content-Length: "
 											+ valueofRequestBody.length()
 											+ "\r\n");
@@ -320,8 +321,9 @@ public class FrontEndServer implements Runnable {
 									 * Respond to client
 									 */
 									BufferedReader recerive_br_2 = new BufferedReader(
-											new InputStreamReader(postSocket_2
-													.getInputStream()));
+											new InputStreamReader(
+													postSocket_2
+															.getInputStream()));
 									String receive_line_2 = null;
 									ArrayList<String> receive_Hearder_2 = new ArrayList<String>();
 
@@ -341,9 +343,8 @@ public class FrontEndServer implements Runnable {
 										logger.info("Post a tweet into data server successfully!");
 										hrh.response(201, "Created", "Created!");
 									} else if (responseType_2.equals("406")) {
-										hrh.response(406, "Not Acceptable",
-												"This tweet exists in data server!");
-										logger.info("This tweet exists in data server!");
+										logger.info("Post a tweet into data server successfully!");
+										hrh.response(201, "Created", "Created!");
 									}
 
 									postSocket_2.close();

@@ -1182,6 +1182,7 @@ public class DataServer implements Runnable {
 					// For test purpose...........................
 					try {
 						Thread.sleep(3000);
+						logger.info("############### For test purpose, kill the primary now!!!!!!!!!!!!!");
 					} catch (InterruptedException e) {
 						logger.debug(e.getMessage(), e);
 					}
