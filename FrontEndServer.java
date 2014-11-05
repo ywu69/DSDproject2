@@ -392,11 +392,6 @@ public class FrontEndServer implements Runnable {
 			} catch (IOException e) {
 				logger.debug(e.getMessage(), e);
 
-				try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e2) {
-					logger.debug(e2.getMessage(), e2);
-				}
 				retrievePrimary();
 				try {
 					Socket postSocket_2 = new Socket(currentPrimary_ipAddrs,
@@ -765,11 +760,7 @@ public class FrontEndServer implements Runnable {
 					connectToDsSocket.close();
 				} catch (IOException e) {
 					logger.debug(e.getMessage(), e);
-					try {
-						Thread.sleep(5000);
-					} catch (InterruptedException e2) {
-						logger.debug(e2.getMessage(), e2);
-					}
+					
 					try {
 						/*
 						 * Retrieve primary again and send search message to
