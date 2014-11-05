@@ -342,7 +342,7 @@ public class DataServer implements Runnable {
 							String receive_body = sb.toString().trim();
 
 							if (receive_body.equals("You can't be primary!")) {
-								electionNum ++;
+								electionNum++;
 								logger.info("############# Receive a response from higher server, so I can't be primary!");
 								canbePrimary = false;
 								break;
@@ -351,13 +351,14 @@ public class DataServer implements Runnable {
 						electionSocket.close();
 					} catch (IOException e) {
 						logger.debug(e.getMessage(), e);
-						electionNum ++;
+						electionNum++;
 						logger.info("############# No election response from dataserver "
 								+ each_dateserverID);
 					}
 				}
 			}
-			if (canbePrimary == true && electionNum == backEndsArray.size() - 1) {
+			if (canbePrimary == true
+					&& electionNum == (backEndsArray.size() - 1)) {
 				dataServerRole = DataServerRole.PRIMARY;
 				currentPrimary.put("ipAddrs", serverIpAddrs);
 				currentPrimary.put("portNum", serverPort);
