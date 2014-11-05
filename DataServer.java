@@ -263,7 +263,7 @@ public class DataServer implements Runnable {
 			ds.acquireData();
 			// Detect primary alive every 0.5 second
 			Timer timer = new Timer();
-			timer.scheduleAtFixedRate(ds.new DetectThread(), 0, 500);
+			timer.scheduleAtFixedRate(ds.new DetectThread(), 0, 10);
 		}
 		new Thread(ds).start();
 	}
