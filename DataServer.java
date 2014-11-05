@@ -234,8 +234,10 @@ public class DataServer implements Runnable {
 					ds_tweetsMap.setTweetsHashMap(key, tweetsData);
 				}
 
-				logger.info("Acquire data from primary server successfully! My dataServer version is: "
+				logger.info("Acquire data from primary server successfully! My current dataServer version is: "
 						+ ds_tweetsMap.getDataServerVersion());
+				logger.info("My current database is: " + entireData);
+
 			} else {
 				logger.info("Fail to acquire data from primary server!");
 			}
@@ -1011,6 +1013,27 @@ public class DataServer implements Runnable {
 							newHashtagsArray);
 					logger.info("Successfully consistent my data, my current data version is: "
 							+ ds_tweetsMap.getDataServerVersion());
+					HashMap<String, TweetsData> responseMap = ds_tweetsMap
+							.getEntireMap();
+					JSONObject entireData = new JSONObject();
+					JSONArray entireDataArray = new JSONArray();
+					for (Map.Entry<String, TweetsData> entry : responseMap
+							.entrySet()) {
+						String key = entry.getKey();
+						TweetsData value = entry.getValue();
+						int eachVersionNum = value.getVersionNum();
+						JSONArray eachDataArray = value.getTweetsArray();
+						JSONObject eachObject = new JSONObject();
+
+						eachObject.put("key", key);
+						eachObject.put("versionNum", eachVersionNum);
+						eachObject.put("dataArray", eachDataArray);
+						entireDataArray.add(eachObject);
+					}
+					entireData.put("dataServerVersion",
+							ds_tweetsMap.getDataServerVersion());
+					entireData.put("entireData", entireDataArray);
+					logger.info("My current database is: " + entireData);
 				}
 
 			} catch (IOException e) {

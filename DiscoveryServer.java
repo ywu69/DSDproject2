@@ -67,7 +67,7 @@ public class DiscoveryServer implements Runnable {
 		new Thread(ds).start();
 		// Detect primary alive every 5 second
 		Timer timer = new Timer();
-		timer.scheduleAtFixedRate(ds.new DetectThread(), 0, 1000);
+		timer.scheduleAtFixedRate(ds.new DetectThread(), 0, 500);
 	}
 
 	class DetectThread extends TimerTask {
