@@ -286,9 +286,73 @@ public class FrontEndServer implements Runnable {
 
 							String line = recerive_br.readLine();
 							if (line == null) {
-								logger.info("Primary Server Unavailable!");
-								hrh.response(503, "Service Unavailable",
-										"Primary Server Unavailable, please try later!");
+								/*
+								 * Retrieve primary again and send post message
+								 * to data server again
+								 */
+								try {
+									Thread.sleep(5000);
+								} catch (InterruptedException e2) {
+									logger.debug(e2.getMessage(), e2);
+								}
+								retrievePrimary();
+
+								try {
+									Socket postSocket_2 = new Socket(
+											currentPrimary_ipAddrs,
+											currentPrimary_portNum);
+									BufferedWriter wr_2 = new BufferedWriter(
+											new OutputStreamWriter(
+													postSocket
+															.getOutputStream()));
+
+									String path_2 = "/tweets";
+									wr_2.write("POST " + path_2 + " HTTP/1.1\r\n");
+									wr_2.write("Content-Length: "
+											+ valueofRequestBody.length()
+											+ "\r\n");
+									wr_2.write("Content-Type: application/json\r\n");
+									wr_2.write("\r\n");
+									wr_2.write(addTweetBody.toString());
+									wr_2.flush();
+
+									/*
+									 * Respond to client
+									 */
+									BufferedReader recerive_br_2 = new BufferedReader(
+											new InputStreamReader(postSocket
+													.getInputStream()));
+									String receive_line_2 = null;
+									ArrayList<String> receive_Hearder_2 = new ArrayList<String>();
+
+									while (!(receive_line_2 = recerive_br_2
+											.readLine().trim()).equals("")) {
+										receive_Hearder_2.add(receive_line_2);
+									}
+
+									String[] responseHeader_2 = null;
+									responseHeader_2 = receive_Hearder_2.get(0)
+											.trim().split(" ");
+
+									String responseType_2 = null;
+									responseType_2 = responseHeader_2[1];
+
+									if (responseType_2.equals("201")) {
+										logger.info("Post a tweet into data server successfully!");
+										hrh.response(201, "Created", "Created!");
+									} else if (responseType_2.equals("406")) {
+										hrh.response(406, "Not Acceptable",
+												"This tweet exists in data server!");
+										logger.info("This tweet exists in data server!");
+									}
+
+									postSocket_2.close();
+								} catch (IOException e1) {
+									logger.debug(e1.getMessage(), e1);
+									logger.info("Primary Server Unavailable!");
+									hrh.response(503, "Service Unavailable",
+											"Primary Server Unavailable, please try later!");
+								}
 							} else {
 								receive_Hearder.add(line);
 								while (!(receive_line = recerive_br.readLine()
@@ -326,68 +390,6 @@ public class FrontEndServer implements Runnable {
 				}
 			} catch (IOException e) {
 				logger.debug(e.getMessage(), e);
-
-				/*
-				 * Retrieve primary again and send post message to data server
-				 * again
-				 */
-				try {
-					Thread.sleep(5000);
-				} catch (InterruptedException e2) {
-					logger.debug(e2.getMessage(), e2);
-				}
-				retrievePrimary();
-
-				try {
-					Socket postSocket = new Socket(currentPrimary_ipAddrs,
-							currentPrimary_portNum);
-					BufferedWriter wr = new BufferedWriter(
-							new OutputStreamWriter(postSocket.getOutputStream()));
-
-					String path = "/tweets";
-					wr.write("POST " + path + " HTTP/1.1\r\n");
-					wr.write("Content-Length: " + valueofRequestBody.length()
-							+ "\r\n");
-					wr.write("Content-Type: application/json\r\n");
-					wr.write("\r\n");
-					wr.write(addTweetBody.toString());
-					wr.flush();
-
-					/*
-					 * Respond to client
-					 */
-					BufferedReader recerive_br = new BufferedReader(
-							new InputStreamReader(postSocket.getInputStream()));
-					String receive_line = null;
-					ArrayList<String> receive_Hearder = new ArrayList<String>();
-
-					while (!(receive_line = recerive_br.readLine().trim())
-							.equals("")) {
-						receive_Hearder.add(receive_line);
-					}
-
-					String[] responseHeader = null;
-					responseHeader = receive_Hearder.get(0).trim().split(" ");
-
-					String responseType = null;
-					responseType = responseHeader[1];
-
-					if (responseType.equals("201")) {
-						logger.info("Post a tweet into data server successfully!");
-						hrh.response(201, "Created", "Created!");
-					} else if (responseType.equals("406")) {
-						hrh.response(406, "Not Acceptable",
-								"This tweet exists in data server!");
-						logger.info("This tweet exists in data server!");
-					}
-
-					postSocket.close();
-				} catch (IOException e1) {
-					logger.debug(e1.getMessage(), e1);
-					logger.info("Primary Server Unavailable!");
-					hrh.response(503, "Service Unavailable",
-							"Primary Server Unavailable, please try later!");
-				}
 			} catch (ParseException e) {
 				logger.debug(e.getMessage(), e);
 			}
