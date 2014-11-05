@@ -359,6 +359,11 @@ public class DataServer implements Runnable {
 				currentPrimary.put("ipAddrs", serverIpAddrs);
 				currentPrimary.put("portNum", serverPort);
 				currentPrimary.put("dataserverID", dataserverID);
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					logger.debug(e.getMessage(), e);
+				}
 				logger.info("################## Resolve any inconsistencies in all data servers");
 				consistentData();
 			}
