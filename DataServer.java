@@ -304,6 +304,7 @@ public class DataServer implements Runnable {
 
 		private void bullyElect() {
 			boolean canbePrimary = true;
+			int electionNum = 0;
 			for (int i = 0; i < backEndsArray.size(); i++) {
 				JSONObject eachBackEnd = (JSONObject) backEndsArray.get(i);
 				int each_dateserverID = Integer.valueOf(eachBackEnd.get(
@@ -341,6 +342,7 @@ public class DataServer implements Runnable {
 							String receive_body = sb.toString().trim();
 
 							if (receive_body.equals("You can't be primary!")) {
+								electionNum ++;
 								logger.info("############# Receive a response from higher server, so I can't be primary!");
 								canbePrimary = false;
 								break;
@@ -349,21 +351,18 @@ public class DataServer implements Runnable {
 						electionSocket.close();
 					} catch (IOException e) {
 						logger.debug(e.getMessage(), e);
+						electionNum ++;
 						logger.info("############# No election response from dataserver "
 								+ each_dateserverID);
 					}
 				}
 			}
-			if (canbePrimary == true) {
+			if (canbePrimary == true && electionNum == backEndsArray.size() - 1) {
 				dataServerRole = DataServerRole.PRIMARY;
 				currentPrimary.put("ipAddrs", serverIpAddrs);
 				currentPrimary.put("portNum", serverPort);
 				currentPrimary.put("dataserverID", dataserverID);
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					logger.debug(e.getMessage(), e);
-				}
+
 				logger.info("################## Resolve any inconsistencies in all data servers");
 				consistentData();
 			}
