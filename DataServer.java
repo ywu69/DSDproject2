@@ -866,6 +866,11 @@ public class DataServer implements Runnable {
 		private void getMyLastestVersion(HTTPResponseHandler hrh) {
 			int myLatestVersion = ds_tweetsMap.getDataServerVersion();
 			String ss = String.valueOf(myLatestVersion);
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				logger.debug(e.getMessage(), e);
+			}
 			hrh.response(200, "OK", ss);
 		}
 
@@ -1180,12 +1185,7 @@ public class DataServer implements Runnable {
 					} catch (IOException e) {
 						logger.debug(e.getMessage(), e);
 					}
-					// For test purpose...........................
-					try {
-						Thread.sleep(3000);
-					} catch (InterruptedException e) {
-						logger.debug(e.getMessage(), e);
-					}
+
 				}
 			}
 
