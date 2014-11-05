@@ -417,26 +417,32 @@ public class FrontEndServer implements Runnable {
 					String receive_line_2 = null;
 					ArrayList<String> receive_Hearder_2 = new ArrayList<String>();
 
-					while (!(receive_line_2 = recerive_br_2.readLine().trim())
-							.equals("")) {
-						receive_Hearder_2.add(receive_line_2);
-					}
-
-					String[] responseHeader_2 = null;
-					responseHeader_2 = receive_Hearder_2.get(0).trim()
-							.split(" ");
-
-					String responseType_2 = null;
-					responseType_2 = responseHeader_2[1];
-
-					if (responseType_2.equals("201")) {
+					String line_2 = recerive_br_2.readLine();
+					if (line_2 == null) {
 						logger.info("Post a tweet into data server successfully!");
 						hrh.response(201, "Created", "Created!");
-					} else if (responseType_2.equals("406")) {
-						logger.info("Post a tweet into data server successfully!");
-						hrh.response(201, "Created", "Created!");
-					}
+					} else {
+						receive_Hearder_2.add(line_2);
+						while (!(receive_line_2 = recerive_br_2.readLine()
+								.trim()).equals("")) {
+							receive_Hearder_2.add(receive_line_2);
+						}
 
+						String[] responseHeader_2 = null;
+						responseHeader_2 = receive_Hearder_2.get(0).trim()
+								.split(" ");
+
+						String responseType_2 = null;
+						responseType_2 = responseHeader_2[1];
+
+						if (responseType_2.equals("201")) {
+							logger.info("Post a tweet into data server successfully!");
+							hrh.response(201, "Created", "Created!");
+						} else if (responseType_2.equals("406")) {
+							logger.info("Post a tweet into data server successfully!");
+							hrh.response(201, "Created", "Created!");
+						}
+					}
 					postSocket_2.close();
 				} catch (IOException e2) {
 					logger.debug(e2.getMessage(), e2);
@@ -760,7 +766,7 @@ public class FrontEndServer implements Runnable {
 					connectToDsSocket.close();
 				} catch (IOException e) {
 					logger.debug(e.getMessage(), e);
-					
+
 					try {
 						/*
 						 * Retrieve primary again and send search message to
