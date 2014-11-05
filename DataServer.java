@@ -317,6 +317,7 @@ public class DataServer implements Runnable {
 			} catch (IOException e) {
 				logger.debug(e.getMessage(), e);
 				logger.info("Primary down, begin election###########################");
+				backEndsArray.remove(currentPrimary);
 				bullyElect();
 			}
 		}
