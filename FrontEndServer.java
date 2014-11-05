@@ -331,6 +331,11 @@ public class FrontEndServer implements Runnable {
 				 * Retrieve primary again and send post message to data server
 				 * again
 				 */
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e2) {
+					logger.debug(e2.getMessage(), e2);
+				}
 				retrievePrimary();
 
 				try {
@@ -552,6 +557,11 @@ public class FrontEndServer implements Runnable {
 						 * Retrieve primary again and send search message to
 						 * data server again
 						 */
+						try {
+							Thread.sleep(5000);
+						} catch (InterruptedException e2) {
+							logger.debug(e2.getMessage(), e2);
+						}
 						retrievePrimary();
 						Socket connectToDsSocket = new Socket(
 								currentPrimary_ipAddrs, currentPrimary_portNum);
