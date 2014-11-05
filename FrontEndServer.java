@@ -100,7 +100,7 @@ public class FrontEndServer implements Runnable {
 			} catch (ParseException e) {
 				logger.debug(e.getMessage(), e);
 			}
-			logger.info("I'm new frontend, the current primary is: "
+			logger.info("I'm frontend, the current primary is: "
 					+ currentPrimary_ipAddrs + "  " + currentPrimary_portNum);
 			registerSocket.close();
 		} catch (IOException e) {
