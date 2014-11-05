@@ -303,7 +303,7 @@ public class FrontEndServer implements Runnable {
 											currentPrimary_portNum);
 									BufferedWriter wr_2 = new BufferedWriter(
 											new OutputStreamWriter(
-													postSocket
+													postSocket_2
 															.getOutputStream()));
 
 									String path_2 = "/tweets";
@@ -320,7 +320,7 @@ public class FrontEndServer implements Runnable {
 									 * Respond to client
 									 */
 									BufferedReader recerive_br_2 = new BufferedReader(
-											new InputStreamReader(postSocket
+											new InputStreamReader(postSocket_2
 													.getInputStream()));
 									String receive_line_2 = null;
 									ArrayList<String> receive_Hearder_2 = new ArrayList<String>();
