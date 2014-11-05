@@ -261,9 +261,9 @@ public class DataServer implements Runnable {
 		if (ds.dataServerRole == DataServerRole.SECONDARY) {
 			// Acquire current data from primary server
 			ds.acquireData();
-			// Detect primary alive every 1 second
+			// Detect primary alive every 0.5 second
 			Timer timer = new Timer();
-			timer.scheduleAtFixedRate(ds.new DetectThread(), 0, 1000);
+			timer.scheduleAtFixedRate(ds.new DetectThread(), 0, 500);
 		}
 		new Thread(ds).start();
 	}
@@ -1182,7 +1182,6 @@ public class DataServer implements Runnable {
 					// For test purpose...........................
 					try {
 						Thread.sleep(3000);
-						logger.info("############### For test purpose, kill the primary now!!!!!!!!!!!!!");
 					} catch (InterruptedException e) {
 						logger.debug(e.getMessage(), e);
 					}
