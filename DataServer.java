@@ -146,8 +146,6 @@ public class DataServer implements Runnable {
 						+ dataserverID);
 				logger.info("Current primary server is: "
 						+ currentPrimary.toString());
-				// logger.info("Current backEndsArray is: "
-				// + backEndsArray.toString());
 			} else {
 				dataServerRole = DataServerRole.SECONDARY;
 				logger.info("############ I'm  " + dataServerRole);
@@ -155,8 +153,6 @@ public class DataServer implements Runnable {
 						+ dataserverID);
 				logger.info("Current primary server is: "
 						+ currentPrimary.toString());
-				// logger.info("Current backEndsArray is: "
-				// + backEndsArray.toString());
 			}
 		} catch (IOException e) {
 			logger.debug(e.getMessage(), e);
@@ -265,9 +261,9 @@ public class DataServer implements Runnable {
 		if (ds.dataServerRole == DataServerRole.SECONDARY) {
 			// Acquire current data from primary server
 			ds.acquireData();
-			// Detect primary alive every 5 second
+			// Detect primary alive every 1 second
 			Timer timer = new Timer();
-			timer.scheduleAtFixedRate(ds.new DetectThread(), 0, 3000);
+			timer.scheduleAtFixedRate(ds.new DetectThread(), 0, 1000);
 		}
 		new Thread(ds).start();
 	}
@@ -296,24 +292,6 @@ public class DataServer implements Runnable {
 				wr.write("GET " + path + " HTTP/1.1\r\n");
 				wr.write("\r\n");
 				wr.flush();
-
-				// BufferedReader recerive_br = new BufferedReader(
-				// new InputStreamReader(detectSocket.getInputStream()));
-				//
-				// while (!(recerive_br.readLine().trim()).equals("")) {
-				// }
-				//
-				// if (recerive_br.ready()) {
-				// char[] bodyChars = new char[1000];
-				// recerive_br.read(bodyChars);
-				// StringBuffer sb = new StringBuffer();
-				// sb.append(bodyChars);
-				// String receive_body = sb.toString().trim();
-				//
-				// if (receive_body.equals("I'm alive!")) {
-				// logger.info("Primary data server is alive!");
-				// }
-				// }
 
 				detectSocket.close();
 			} catch (IOException e) {
@@ -389,7 +367,6 @@ public class DataServer implements Runnable {
 		private void consistentData() {
 			int oldestDataVersion = ds_tweetsMap.getDataServerVersion();
 			int latestDataVersion = ds_tweetsMap.getDataServerVersion();
-			int latestDataserverID = dataserverID;
 			String latestDataserverIpAddrs = serverIpAddrs;
 			int latestDataserverPortNum = serverPort;
 
@@ -437,7 +414,6 @@ public class DataServer implements Runnable {
 
 						if (each_DataVersion > latestDataVersion) {
 							latestDataVersion = each_DataVersion;
-							latestDataserverID = each_dateserverID;
 							latestDataserverIpAddrs = eachBackEnd_ipAddrs;
 							latestDataserverPortNum = eachBackEnd_portNum;
 						}
@@ -450,9 +426,10 @@ public class DataServer implements Runnable {
 			}
 
 			if (oldestDataVersion < latestDataVersion) {
-				// Notify latest version data server to consistent data to all
-				// data
-				// servers
+				/*
+				 * Notify latest version data server to consistent data to all
+				 * data servers
+				 */
 				try {
 					Socket getDataSocket = new Socket(latestDataserverIpAddrs,
 							latestDataserverPortNum);

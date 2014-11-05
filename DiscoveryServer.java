@@ -65,7 +65,7 @@ public class DiscoveryServer implements Runnable {
 		int PORT = 4005;
 		DiscoveryServer ds = new DiscoveryServer(PORT);
 		new Thread(ds).start();
-		// Detect primary alive every 5 second
+		// Detect primary alive every 0.5 second
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(ds.new DetectThread(), 0, 500);
 	}
@@ -105,32 +105,7 @@ public class DiscoveryServer implements Runnable {
 						wr.write("GET " + path + " HTTP/1.1\r\n");
 						wr.write("\r\n");
 						wr.flush();
-
 						wr.close();
-
-//						BufferedReader recerive_br = new BufferedReader(
-//								new InputStreamReader(
-//										detectSocket.getInputStream()));
-//
-//						while (!(recerive_br.readLine().trim()).equals("")) {
-//						}
-//
-//						if (recerive_br.ready()) {
-//							char[] bodyChars = new char[1000];
-//							recerive_br.read(bodyChars);
-//							StringBuffer sb = new StringBuffer();
-//							sb.append(bodyChars);
-//							String receive_body = sb.toString().trim();
-//
-//							if (receive_body.equals("I'm alive!")) {
-//								if (dateserverID == currentPrimaryID) {
-//									logger.info("Primary dataserver is alive!");
-//								} else {
-//									logger.info("No." + dateserverID
-//											+ " secondary dataserver is alive!");
-//								}
-//							}
-//						}
 
 						detectSocket.close();
 					} catch (IOException e) {
@@ -285,15 +260,11 @@ public class DiscoveryServer implements Runnable {
 							logger.debug(e.getMessage(), e);
 						}
 					}
-
-					/*
-					 * Add new backend to backEndsArray
-					 */
+					
+					// Add new backend to backEndsArray
 					discoveryData.addBackEnd(ipAddrs, portNum);
 
-					/*
-					 * Response to new backend
-					 */
+					// Response to new backend
 					JSONObject currentPrimary = discoveryData
 							.getCurrentPrimary();
 
@@ -318,9 +289,7 @@ public class DiscoveryServer implements Runnable {
 		}
 
 		private void responsePrimaryInfo(HTTPResponseHandler hrh) {
-			/*
-			 * Response to new frontend
-			 */
+			// Response to frontend
 			JSONObject currentPrimary = discoveryData.getCurrentPrimary();
 			hrh.response(200, "OK", currentPrimary.toString());
 		}

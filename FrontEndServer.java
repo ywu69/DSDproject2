@@ -391,7 +391,7 @@ public class FrontEndServer implements Runnable {
 				}
 			} catch (IOException e) {
 				logger.debug(e.getMessage(), e);
-				
+
 				retrievePrimary();
 				try {
 					Socket postSocket_2 = new Socket(currentPrimary_ipAddrs,
@@ -522,9 +522,161 @@ public class FrontEndServer implements Runnable {
 
 					String line = recerive_br.readLine();
 					if (line == null) {
-						logger.info("Primary Server Unavailable!");
-						hrh.response(503, "Service Unavailable",
-								"Primary Server Unavailable, please try later!");
+						try {
+							/*
+							 * Retrieve primary again and send search message to
+							 * data server again
+							 */
+							try {
+								Thread.sleep(5000);
+							} catch (InterruptedException e2) {
+								logger.debug(e2.getMessage(), e2);
+							}
+							retrievePrimary();
+							Socket connectToDsSocket_2 = new Socket(
+									currentPrimary_ipAddrs,
+									currentPrimary_portNum);
+							BufferedWriter wr_2 = new BufferedWriter(
+									new OutputStreamWriter(
+											connectToDsSocket_2
+													.getOutputStream()));
+
+							String searchterm_2 = searchtermHashMap.get("q");
+							int cache_versionNum_2 = -1;
+
+							/*
+							 * If the cache does not have this searchterm, set
+							 * the versionNum to -1 Then send the GET request to
+							 * data server
+							 */
+							logger.info("Sending a search request to data server...............");
+
+							if (!fe_tweetsMap.containsKey(searchterm_2)) {
+								wr_2.write("GET " + "/tweets?q=" + searchterm_2
+										+ "&" + "v=" + "-1" + " HTTP/1.1\r\n");
+								wr_2.write("\r\n");
+							}
+							/*
+							 * If the cache has this searchterm, set the
+							 * versionNum to cache_versionNum Then send the GET
+							 * request to data server
+							 */
+							else {
+								cache_versionNum_2 = fe_tweetsMap
+										.getVersionNum(searchterm_2);
+
+								wr_2.write("GET " + "/tweets?q=" + searchterm_2
+										+ "&" + "v=" + cache_versionNum_2
+										+ " HTTP/1.1\r\n");
+								wr_2.write("\r\n");
+							}
+							wr_2.flush();
+
+							/*
+							 * Receive the response from data server
+							 */
+							logger.info("Receiving a search response from data server...............");
+
+							BufferedReader recerive_br_2 = new BufferedReader(
+									new InputStreamReader(
+											connectToDsSocket_2
+													.getInputStream()));
+							String receive_line_2 = null;
+							ArrayList<String> receive_Hearder_2 = new ArrayList<String>();
+
+							while (!(receive_line_2 = recerive_br_2.readLine()
+									.trim()).equals("")) {
+								receive_Hearder_2.add(receive_line_2);
+							}
+
+							char[] bodyChars_2 = new char[1000];
+							recerive_br_2.read(bodyChars_2);
+							StringBuffer sb_2 = new StringBuffer();
+							sb_2.append(bodyChars_2);
+							String receive_body_2 = sb_2.toString().trim();
+
+							/*
+							 * If the response from data server is
+							 * "Your version is up-to-date!", get the tweets of
+							 * this serachterm from cache and send it to client
+							 */
+							if (receive_body_2
+									.equals("Your version is up-to-date!")) {
+								JSONArray final_tweetArray = fe_tweetsMap
+										.getTweetsArray(searchterm);
+								JSONObject final_response = new JSONObject();
+								final_response.put("q", searchterm);
+								final_response.put("tweets", final_tweetArray);
+								hrh.response(200, "OK",
+										final_response.toString());
+								logger.info("Response to client directly............");
+							}
+							/*
+							 * If the response from data server is not
+							 * "Your version is up-to-date!", get the tweets of
+							 * this serachterm from data server and send it to
+							 * client
+							 */
+							else {
+								JSONParser jp = new JSONParser();
+								JSONObject receiveBody_2 = (JSONObject) jp
+										.parse(receive_body_2);
+								int ds_versionNum_2 = Integer
+										.valueOf(receiveBody_2.get("v")
+												.toString());
+
+								JSONObject final_response_2 = new JSONObject();
+								JSONArray final_tweetArray_2 = (JSONArray) receiveBody_2
+										.get("tweets");
+
+								/*
+								 * If the versionNum in the response is -1, that
+								 * means the data server also contains no this
+								 * searchterm Then send an response with empty
+								 * tweet array to client
+								 */
+								if (ds_versionNum_2 == -1) {
+									final_response_2.put("q", searchterm);
+									final_response_2.put("tweets",
+											final_tweetArray_2);
+									hrh.response(200, "OK",
+											final_response_2.toString());
+									logger.info("No search result............");
+								}
+								/*
+								 * If the versionNum in the response is not -1,
+								 * that means the cache need to update its
+								 * version, Then send an response with the
+								 * tweets about this serchterm from data server
+								 * to client, Then update the cache to latest
+								 * version
+								 */
+								else {
+									final_response_2.put("q", searchterm);
+									final_response_2.put("tweets",
+											final_tweetArray_2);
+									hrh.response(200, "OK",
+											final_response_2.toString());
+									logger.info("Response to client and update the cache............");
+									/* Update CacheHashMap */
+									TweetsData final_tweetsData_2 = new TweetsData();
+									final_tweetsData_2
+											.setVersionNum(ds_versionNum_2);
+									final_tweetsData_2
+											.setTweetsArray(final_tweetArray_2);
+									fe_tweetsMap.setTweetsHashMap(searchterm_2,
+											final_tweetsData_2);
+								}
+							}
+							connectToDsSocket_2.close();
+						} catch (IOException e2) {
+							logger.debug(e2.getMessage(), e2);
+							logger.info("Primary Server Unavailable!");
+							hrh.response(503, "Service Unavailable",
+									"Primary Server Unavailable, please try later!");
+						} catch (ParseException e2) {
+							logger.debug(e2.getMessage(), e2);
+						}
 					} else {
 						receive_Hearder.add(line);
 						while (!(receive_line = recerive_br.readLine().trim())
@@ -613,11 +765,6 @@ public class FrontEndServer implements Runnable {
 						 * Retrieve primary again and send search message to
 						 * data server again
 						 */
-						try {
-							Thread.sleep(5000);
-						} catch (InterruptedException e2) {
-							logger.debug(e2.getMessage(), e2);
-						}
 						retrievePrimary();
 						Socket connectToDsSocket = new Socket(
 								currentPrimary_ipAddrs, currentPrimary_portNum);
