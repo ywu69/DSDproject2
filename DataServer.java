@@ -263,7 +263,7 @@ public class DataServer implements Runnable {
 			ds.acquireData();
 			// Detect primary alive every 0.5 second
 			Timer timer = new Timer();
-			timer.scheduleAtFixedRate(ds.new DetectThread(), 0, 10);
+			timer.scheduleAtFixedRate(ds.new DetectThread(), 0, 500);
 		}
 		new Thread(ds).start();
 	}
@@ -360,7 +360,7 @@ public class DataServer implements Runnable {
 				currentPrimary.put("portNum", serverPort);
 				currentPrimary.put("dataserverID", dataserverID);
 				try {
-					Thread.sleep(100);
+					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 					logger.debug(e.getMessage(), e);
 				}
